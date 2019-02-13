@@ -32,6 +32,9 @@ def extract_movies(dom):
     # NOTE: FOR THIS EXERCISE YOU ARE ALLOWED (BUT NOT REQUIRED) TO IGNORE
     # UNICODE CHARACTERS AND SIMPLY LEAVE THEM OUT OF THE OUTPUT.
     file = dom
+    file_extracted = file.find_all('div', attrs={'class':"lister-item-content"})
+    print(file_extracted)
+
     return []   # REPLACE THIS LINE AS WELL IF APPROPRIATE
 
 
