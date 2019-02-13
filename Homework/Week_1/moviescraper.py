@@ -34,15 +34,21 @@ def extract_movies(dom):
 
     # every movie has its entry fields extracted into a list
     for films in file_extracted:
+        # title is extracted from the header class
         title = films.find('h3', attrs={'class':"lister-item-header"}).a.string
+        # rating is extracted from the rating class and then trimmed to leave out the brackets
         rating = films.find('div', attrs={'class':"inline-block ratings-imdb-rating"}).get_text()[2:5]
+        # year is extracted from a year class, other data is trimmed off
         year = films.find('span', attrs={'class':"lister-item-year"}).string[-5:-1]
+        # actors are extracted into a joined list from a class without a name
+        # actors were always in the last four 'a' tag entries
         actors = ", ".join([actor.string for actor in films.find('p', attrs={'class':""}).find_all('a')[-4:]])
+        # runtime is extracted from a runtime class, trimming of the minute string to keep only the numbers
         runtime = films.find('span', attrs={'class':"runtime"}).string[:-4]
 
-        # a list is created so it can be used for csv data visualisation
+        # the list is filled so it can be used for csv data visualisation
         movies.append([title, rating, year, actors, runtime])
-
+    # returns the movies with filled entry fields
     return movies
 
 
