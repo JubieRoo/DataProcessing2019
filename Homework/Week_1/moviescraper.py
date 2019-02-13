@@ -26,22 +26,23 @@ def extract_movies(dom):
     - Actors/actresses (comma separated if more than one)
     - Runtime (only a number!)
     """
-
-    # ADD YOUR CODE HERE TO EXTRACT THE ABOVE INFORMATION ABOUT THE
-    # HIGHEST RATED MOVIES
-    # NOTE: FOR THIS EXERCISE YOU ARE ALLOWED (BUT NOT REQUIRED) TO IGNORE
-    # UNICODE CHARACTERS AND SIMPLY LEAVE THEM OUT OF THE OUTPUT.
-
+    # creates list to fill with movie entries
     movies = []
-    file_extracted = dom.find_all('div', attrs={'class':"lister-item-content"}) # all movie data
+
+    # downsizes the datafile to include a list with only all data per movie, making extraction easier
+    file_extracted = dom.find_all('div', attrs={'class':"lister-item-content"})
+
+    # every movie has its entry fields extracted into a list
     for films in file_extracted:
         title = films.find('h3', attrs={'class':"lister-item-header"}).a.string
         rating = films.find('div', attrs={'class':"inline-block ratings-imdb-rating"}).get_text()[2:5]
         year = films.find('span', attrs={'class':"lister-item-year"}).string[-5:-1]
-        actors = [actor.string for actor in films.find('p', attrs={'class':""}).find_all('a')[-4:]]
+        actors = ", ".join([actor.string for actor in films.find('p', attrs={'class':""}).find_all('a')[-4:]])
         runtime = films.find('span', attrs={'class':"runtime"}).string[:-4]
 
+        # a list is created so it can be used for csv data visualisation
         movies.append([title, rating, year, actors, runtime])
+
     return movies
 
 
@@ -51,10 +52,9 @@ def save_csv(outfile, movies):
     """
     writer = csv.writer(outfile)
     writer.writerow(['Title', 'Rating', 'Year', 'Actors', 'Runtime'])
+    # every movie entry gets a new row
     for movie in movies:
         writer.writerow(movie)
-
-    # ADD SOME CODE OF YOURSELF HERE TO WRITE THE MOVIES TO DISK
 
 
 def simple_get(url):
