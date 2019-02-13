@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Name: Ruby Bron
 # Student number: 12474223
 """
@@ -30,7 +31,7 @@ def extract_movies(dom):
     # HIGHEST RATED MOVIES
     # NOTE: FOR THIS EXERCISE YOU ARE ALLOWED (BUT NOT REQUIRED) TO IGNORE
     # UNICODE CHARACTERS AND SIMPLY LEAVE THEM OUT OF THE OUTPUT.
-
+    file = dom
     return []   # REPLACE THIS LINE AS WELL IF APPROPRIATE
 
 
