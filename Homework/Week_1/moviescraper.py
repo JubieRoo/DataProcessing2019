@@ -32,8 +32,18 @@ def extract_movies(dom):
     # NOTE: FOR THIS EXERCISE YOU ARE ALLOWED (BUT NOT REQUIRED) TO IGNORE
     # UNICODE CHARACTERS AND SIMPLY LEAVE THEM OUT OF THE OUTPUT.
     file = dom
-    file_extracted = file.find_all('div', attrs={'class':"lister-item-content"})
-    print(file_extracted)
+    file_extracted = file.find_all('div', attrs={'class':"lister-item-content"}) # all movie data
+    for films in file_extracted:
+        title = films.find('h3', attrs={'class':"lister-item-header"}).a.string
+        rating = films.find('div', attrs={'class':"inline-block ratings-imdb-rating"}).get_text()[2:5]
+        year = films.find('span', attrs={'class':"lister-item-year"}).string[-5:-1]
+        actors = [actor.string for actor in films.find('p', attrs={'class':""}).find_all('a')[-4:]]
+
+            #actors = directors_and_actors.find_all('a')[-4:]
+        runtime = films.find('span', attrs={'class':"runtime"}).string[:-4]
+
+
+        print(title, rating, year, actors, runtime)
 
     return []   # REPLACE THIS LINE AS WELL IF APPROPRIATE
 
