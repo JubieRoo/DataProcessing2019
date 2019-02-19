@@ -15,7 +15,10 @@ import pandas as pd
 # Global constants
 INPUT_CSV = pd.read_csv("input.csv")
 
+
 dataframe = pd.DataFrame(data=INPUT_CSV)
+df_columns = dataframe.loc[:,['Country', 'Region', 'Pop. Density (per sq. mi.)', 'Infant mortality (per 1000 births)', 'GDP ($ per capita) dollars']]
+# df_grouped = dataframe.groupby('Region').sum()
 
 if __name__ == "__main__":
-	print(dataframe)
+	print(df_columns)
