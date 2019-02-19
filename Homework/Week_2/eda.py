@@ -17,8 +17,9 @@ INPUT_CSV = pd.read_csv("input.csv")
 
 
 dataframe = pd.DataFrame(data=INPUT_CSV)
-df_columns = dataframe.loc[:,['Country', 'Region', 'Pop. Density (per sq. mi.)', 'Infant mortality (per 1000 births)', 'GDP ($ per capita) dollars']]
+df_compact = dataframe.loc[:,['Country', 'Region', 'Pop. Density (per sq. mi.)', 'Infant mortality (per 1000 births)', 'GDP ($ per capita) dollars']]
+df2 = df_compact.replace('unknown', np.nan)
 # df_grouped = dataframe.groupby('Region').sum()
 
 if __name__ == "__main__":
-	print(df_columns)
+	print(df2)
