@@ -8,18 +8,31 @@ The focus will lie on the following variables:
 """
 
 import csv
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 # Global constants
 INPUT_CSV = pd.read_csv("input.csv")
 
-
+# create dataframe
 dataframe = pd.DataFrame(data=INPUT_CSV)
-df_compact = dataframe.loc[:,['Country', 'Region', 'Pop. Density (per sq. mi.)', 'Infant mortality (per 1000 births)', 'GDP ($ per capita) dollars']]
-df2 = df_compact.replace('unknown', np.nan)
-# df_grouped = dataframe.groupby('Region').sum()
+
+# creates a dataframe with only needed variables
+df_compact = dataframe.loc[:,['Country', 'Region', 
+							  'Pop. Density (per sq. mi.)',
+							  'Infant mortality (per 1000 births)',
+							  'GDP ($ per capita) dollars']]
+
+# removal of Western Sahara as an outlier with two missing values
+# df_compact = df_compact.drop([223])
+
+# treated unknown values as missing values
+df_compact = df_compact.replace('unknown', np.nan)
+
+# removing text from data
+df_compact = df_compact.replace(' dollars$', '', regex=True).astype({ 'GDP ($ per capita) dollars': float})
+
+# Hier komt: Central Tendency(mean, median mode) en 5 nummber summary ()
 
 if __name__ == "__main__":
-	print(df2)
+	print(df_compact)
