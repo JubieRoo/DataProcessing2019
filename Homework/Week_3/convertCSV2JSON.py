@@ -9,6 +9,30 @@ import csv
 import json
 import pandas as pd
 
-# opens the file in csv format
-INPUT_CSV = pd.read_csv("KNMI.txt")
-print(INPUT_CSV)
+# csv input
+FILENAME = "KNMI_temp.txt"
+COLUMN_NAMES = ["STN", "date", "TG"]
+
+
+def open_file(filename):
+	"""
+	Returns a .txt or .csv file as a Pandas Dataframe
+	"""
+
+	df = pd.read_csv(filename, comment='#', header=None, names=COLUMN_NAMES)
+	df_pivot = df.pivot(index="date", columns="STN", values="TG")
+	return(df_pivot)
+
+
+def create_json(df):
+	"""
+	Returns a json file created from a pandas Dataframe
+	"""
+	with open("data.json", "w") as data_json:
+		data_json.write(df.to_json(orient='index'))
+
+
+df = open_file(FILENAME)
+json = create_json(df)
+
+print(json)
