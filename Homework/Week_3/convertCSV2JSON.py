@@ -5,7 +5,6 @@
 Converts a csv data file to a json file
 """
 
-import csv
 import json
 import pandas as pd
 
@@ -20,6 +19,8 @@ def open_file(filename):
 	"""
 
 	df = pd.read_csv(filename, comment='#', header=None, names=COLUMN_NAMES)
+
+	# pivots the dataframe to change the columns
 	df_pivot = df.pivot(index="date", columns="STN", values="TG")
 	return(df_pivot)
 
@@ -34,5 +35,3 @@ def create_json(df):
 
 df = open_file(FILENAME)
 json = create_json(df)
-
-print(json)
