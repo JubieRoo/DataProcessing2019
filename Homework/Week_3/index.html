@@ -96,10 +96,9 @@ I would like to use the one time only wild card for this exercise
 
 
 			function createDataLines(y, json) {
-				// this creates 
+				// this creates a path of the data resulting in a line
 				ctx.beginPath();
 				ctx.strokeStyle = 'teal';
-
 				datapoints = 366;
 				xRange = [];
 				counter = 0;
@@ -108,8 +107,7 @@ I would like to use the one time only wild card for this exercise
 				Object.keys(json).forEach(function(element) {
 					xRange.push(counter*1.85+100);
 					counter++;
-				})
-
+				});
 
 				// creates the line using the transformed data
 				ctx.moveTo(xRange[0], y[0])
@@ -147,11 +145,11 @@ I would like to use the one time only wild card for this exercise
 				for(var i = 0; i < y.length; i++) {
 					ctx.moveTo(x1, y[i]);
 					ctx.lineTo(x2, y[i]);
-					ctx.fillText(yTemp, x1, y[i]-2)
+					ctx.fillText(yTemp, x1, y[i]-2);
 					yTemp = yTemp + 5;
-				}
-				ctx.font = '20px sans-serif'
-				ctx.fillText("T(\xB0C)",55 , 227.5)
+				};
+				ctx.font = '20px sans-serif';
+				ctx.fillText("T(\xB0C)",55 , 227.5);
 				ctx.stroke();
 			}
 
