@@ -1,0 +1,90 @@
+<!--
+Name: Ruby Bron
+Studenid: 12474223
+This file creates a line chart from a json datafile
+-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Line Chart Creator</title>
+	</head>
+	<body>
+		<canvas id="line-graph" width="750" height="400"></canvas>
+		<script>
+			var fileName = "data.json";
+			var txtFile = new XMLHttpRequest();
+			txtFile.onreadystatechange = function() {
+    		if (txtFile.readyState === 4 && txtFile.status == 200) {
+        		var json = JSON.parse(txtFile.responseText);
+        		reformatData(json);
+    			}
+			}
+			txtFile.open("GET", fileName);
+			txtFile.send();
+
+			function reformatData(json) {
+				var temp = [];
+				var domain = [];
+				Object.keys(json).forEach(function(element) {
+					temp.push(json[element]["TG"]);
+				})
+				console.log(temp);
+				domain.push(Math.min(...temp));
+				domain.push(Math.max(...temp));
+				console.log(domain);
+
+			}
+			// this finds the alpha and beta
+			function createTransform(domain, range) {
+			// domain is a two-element array of the data bounds [domain_min, domain_max]
+			// range is a two-element array of the screen bounds [range_min, range_max]
+			// this gives you two equations to solve:
+			// range_min = alpha * domain_min + beta
+			// range_max = alpha * domain_max + beta
+			// a solution would be:
+
+			var domain_min = domain[0]
+			var domain_max = domain[1]
+			var range_min = range[0]
+			var range_max = range[1]
+
+			// formulas to calculate the alpha and the beta
+			var alpha = (range_max - range_min) / (domain_max - domain_min)
+			var beta = range_max - alpha * domain_max
+
+			// returns the function for the linear transformation (y= a * x + b)
+			return function(x){
+				return alpha * x + beta;
+				}
+			}
+
+			// structure for drawing in canvas
+			const canvas = document.getElementById("line-graph");
+			const ctx = canvas.getContext("2d");
+
+			// square in which the graph will be drawn
+			ctx.strokeRect(0, 50, 750, 350);
+
+			//title of graph in personalised font
+			ctx.font = '26px sans-serif'
+			ctx.fillText("Average temperature in 0.1\xB0C Berkhout, the Netherlands (2018)", 0, 40);
+
+			// creates horizontal guidinglines in graph
+			ctx.beginPath();
+			ctx.strokeStyle = 'grey';
+			var x1 = 25;
+			var x2 = 725;
+			var y = 100;
+			var space = 50;
+			var lines = 6;
+			for(var i = 0; i < lines; i++) {
+				ctx.moveTo(x1, y);
+				ctx.lineTo(x2, y);
+				y = y + space;
+			};
+			ctx.moveTo(25, 100);
+			ctx.stroke();
+
+		</script>
+	</body>
+</html>

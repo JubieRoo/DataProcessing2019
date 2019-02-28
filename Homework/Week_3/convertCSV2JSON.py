@@ -9,7 +9,7 @@ import json
 import pandas as pd
 
 # csv input
-FILENAME = "KNMI_temp.txt"
+FILENAME = "KNMI_klein.txt"
 COLUMN_NAMES = ["STN", "date", "TG"]
 
 
@@ -21,8 +21,8 @@ def open_file(filename):
 	df = pd.read_csv(filename, comment='#', header=None, names=COLUMN_NAMES)
 
 	# pivots the dataframe to change the columns
-	df_pivot = df.pivot(index="date", columns="STN", values="TG")
-	return(df_pivot)
+	# df_pivot = df.pivot(columns="date", values="TG")
+	return(df)
 
 
 def create_json(df):
