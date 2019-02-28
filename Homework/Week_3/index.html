@@ -24,7 +24,7 @@ This file creates a line chart from a json datafile
 
 			var temp = [];
 			var domain = [];
-			var range = [100, 350];
+			var range = [350, 100];
 			var yScreen;
 			var yRange = [];
 
@@ -39,12 +39,14 @@ This file creates a line chart from a json datafile
 				console.log(domain);
 
 				yScreen = createTransform(domain, range)
+				yZero = yScreen(0)
 
 				Object.keys(json).forEach(function(element) {
-					console.log(element)
 					yRange.push(yScreen(json[element]["TG"]))
 				})
+
 				createDataLines(yRange, json)
+				createLines(yZero)
 			}
 
 			// this finds the alpha and beta
@@ -103,22 +105,33 @@ This file creates a line chart from a json datafile
 			ctx.font = '26px sans-serif'
 			ctx.fillText("Average temperature in 0.1\xB0C Berkhout, the Netherlands (2018)", 0, 40);
 
-			// creates horizontal lines in graph
-			ctx.beginPath();
-			ctx.strokeStyle = 'grey';
-			var x1 = 25;
-			var x2 = 725;
-			var y = 100;
-			var space = 50;
-			var lines = 6;
-			for(var i = 0; i < lines; i++) {
-				ctx.moveTo(x1, y);
-				ctx.lineTo(x2, y);
-				y = y + space;
-			};
-			ctx.moveTo(25, 100);
-			ctx.stroke();
+			function createLines(zero) {
+				//
+				ctx.beginPath();
+				ctx.strokeStyle = 'grey';
 
+				var x1 = 25;
+				var x2 = 725;
+				var y = zero;
+				ctx.fillText("0", 10, zero)
+				var space = 50;
+				var lines1 = 5;
+				var lines2 = 5;
+				for(var i = 0; i < lines1; i++) {
+					ctx.moveTo(x1, y);
+					ctx.lineTo(x2, y);
+					y = y + space;
+				};
+				y = zero;
+				for(var i = 0; i < lines2; i++) {
+					ctx.moveTo(x1, y);
+					ctx.lineTo(x2, y);
+					y = y - space;
+				};
+				ctx.moveTo(25, 100);
+				ctx.stroke();	
+			}
+		
 		</script>
 	</body>
 </html>
