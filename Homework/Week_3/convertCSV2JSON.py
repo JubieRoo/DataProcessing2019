@@ -3,6 +3,8 @@
 # Student number: 12474223
 """ 
 Converts a csv data file to a json file
+
+I would like to use the one time only wild card for this exercise
 """
 
 import json
