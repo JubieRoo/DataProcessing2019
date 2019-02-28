@@ -22,9 +22,14 @@ This file creates a line chart from a json datafile
 			txtFile.open("GET", fileName);
 			txtFile.send();
 
+			var temp = [];
+			var domain = [];
+			var range = [100, 350];
+			var yScreen;
+			var yRange = [];
+
 			function reformatData(json) {
-				var temp = [];
-				var domain = [];
+				// reformats data for graph
 				Object.keys(json).forEach(function(element) {
 					temp.push(json[element]["TG"]);
 				})
@@ -33,7 +38,15 @@ This file creates a line chart from a json datafile
 				domain.push(Math.max(...temp));
 				console.log(domain);
 
+				yScreen = createTransform(domain, range)
+
+				Object.keys(json).forEach(function(element) {
+					console.log(element)
+					yRange.push(yScreen(json[element]["TG"]))
+				})
+				createDataLines(yRange, json)
 			}
+
 			// this finds the alpha and beta
 			function createTransform(domain, range) {
 			// domain is a two-element array of the data bounds [domain_min, domain_max]
@@ -58,6 +71,27 @@ This file creates a line chart from a json datafile
 				}
 			}
 
+			function createDataLines(y, json) {
+				ctx.beginPath();
+				ctx.strokeStyle = 'green';
+
+				datapoints = 366;
+				console.log(y);
+				xRange = [];
+				counter = 0;
+				Object.keys(json).forEach(function(element) {
+					xRange.push(counter*1.85+50);
+					counter++;
+					})
+
+				ctx.moveTo(xRange[0], y[0])
+				for (var i = 0; i < datapoints; i++) {
+					ctx.lineTo(xRange[i], y[i])
+					console.log(xRange[i], y[i])
+				}
+				ctx.stroke();
+			}
+
 			// structure for drawing in canvas
 			const canvas = document.getElementById("line-graph");
 			const ctx = canvas.getContext("2d");
@@ -69,7 +103,7 @@ This file creates a line chart from a json datafile
 			ctx.font = '26px sans-serif'
 			ctx.fillText("Average temperature in 0.1\xB0C Berkhout, the Netherlands (2018)", 0, 40);
 
-			// creates horizontal guidinglines in graph
+			// creates horizontal lines in graph
 			ctx.beginPath();
 			ctx.strokeStyle = 'grey';
 			var x1 = 25;
