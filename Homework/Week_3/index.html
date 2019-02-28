@@ -12,87 +12,109 @@ I would like to use the one time only wild card for this exercise
 		<title>Line Chart Creator</title>
 	</head>
 	<body>
-		<canvas id="line-graph" width="750" height="400"></canvas>
+		<canvas id="line-graph" width="800" height="450"></canvas>
 		<script>
+			// opens the datafile
 			var fileName = "data.json";
 			var txtFile = new XMLHttpRequest();
 			txtFile.onreadystatechange = function() {
-    		if (txtFile.readyState === 4 && txtFile.status == 200) {
-        		var json = JSON.parse(txtFile.responseText);
-        		reformatData(json);
+    			if (txtFile.readyState === 4 && txtFile.status == 200) {
+        			var json = JSON.parse(txtFile.responseText);
+        			reformatData(json);
     			}
 			}
 			txtFile.open("GET", fileName);
 			txtFile.send();
 
-			var temp = [];
-			var domain = [];
-			var range = [350, 100];
-			var yScreen;
-			var yRange = [];
 
 			function reformatData(json) {
-				// reformats data for graph
+				// this function reformats data for a graph 
+				var domain = [];
+				var temp = [];
+				var yRange = [];
+				var range = [350, 100];
+				var yScreen;
+				var xLine = [];
+
+				// fills a list with temperature data
 				Object.keys(json).forEach(function(element) {
 					temp.push(json[element]["TG"]);
-				})
-				console.log(temp);
+				});
 				domain.push(Math.min(...temp));
 				domain.push(Math.max(...temp));
-				console.log(domain);
 
-				yScreen = createTransform(domain, range)
-				yLine = [yScreen(-150), yScreen(-100), yScreen(-50), yScreen(0), yScreen(50), yScreen(100), yScreen(150), yScreen(200), yScreen(250), yScreen(300),]
+				// creates the scaled y-axis
+				yScreen = createTransform(domain, range);
+				yLine = [yScreen(-150), yScreen(-100), yScreen(-50), yScreen(0), yScreen(50), yScreen(100), yScreen(150), yScreen(200), yScreen(250), yScreen(300),];	
+				yZero = yScreen(0);
 
+				// creates a list of x-values in this case per week a value is added
+				var counter = 0;
+				Object.keys(json).forEach(function(element) {
+					if (element % 7 === 0) {
+						xLine.push(counter * 1.85 + 100);
+						counter = counter + 7;
+					}
+				});
+
+				// creates a list with all temperature data
 				Object.keys(json).forEach(function(element) {
 					yRange.push(yScreen(json[element]["TG"]))
-				})
+				});
 
-				createDataLines(yRange, json)
-				createLines(yLine)
+				// creates the graph with lines
+				createYLines(yLine);
+				createXLines(xLine);
+				createZeroLine(yZero);
+
+				// creates the line of the linegraph using data
+				createDataLines(yRange, json);
 			}
 
-			// this finds the alpha and beta
+
 			function createTransform(domain, range) {
-			// domain is a two-element array of the data bounds [domain_min, domain_max]
-			// range is a two-element array of the screen bounds [range_min, range_max]
-			// this gives you two equations to solve:
-			// range_min = alpha * domain_min + beta
-			// range_max = alpha * domain_max + beta
-			// a solution would be:
+				// domain is a two-element array of the data bounds [domain_min, domain_max]
+				// range is a two-element array of the screen bounds [range_min, range_max]
+				// this gives you two equations to solve:
+				// range_min = alpha * domain_min + beta
+				// range_max = alpha * domain_max + beta
+				// a solution would be:
+				var domain_min = domain[0]
+				var domain_max = domain[1]
+				var range_min = range[0]
+				var range_max = range[1]
 
-			var domain_min = domain[0]
-			var domain_max = domain[1]
-			var range_min = range[0]
-			var range_max = range[1]
+				// formulas to calculate the alpha and the beta
+				var alpha = (range_max - range_min) / (domain_max - domain_min)
+				var beta = range_max - alpha * domain_max
 
-			// formulas to calculate the alpha and the beta
-			var alpha = (range_max - range_min) / (domain_max - domain_min)
-			var beta = range_max - alpha * domain_max
-
-			// returns the function for the linear transformation (y= a * x + b)
-			return function(x){
-				return alpha * x + beta;
+				// returns the function for the linear transformation (y= a * x + b)
+				return function(x){
+					return alpha * x + beta;
 				}
 			}
 
+
 			function createDataLines(y, json) {
+				// this creates 
 				ctx.beginPath();
-				ctx.strokeStyle = 'green';
+				ctx.strokeStyle = 'teal';
 
 				datapoints = 366;
-				console.log(y);
 				xRange = [];
 				counter = 0;
-				Object.keys(json).forEach(function(element) {
-					xRange.push(counter*1.85+50);
-					counter++;
-					})
 
+				// transforms data to fit x-axis
+				Object.keys(json).forEach(function(element) {
+					xRange.push(counter*1.85+100);
+					counter++;
+				})
+
+
+				// creates the line using the transformed data
 				ctx.moveTo(xRange[0], y[0])
 				for (var i = 0; i < datapoints; i++) {
 					ctx.lineTo(xRange[i], y[i])
-					console.log(xRange[i], y[i])
 				}
 				ctx.stroke();
 			}
@@ -102,31 +124,65 @@ I would like to use the one time only wild card for this exercise
 			const ctx = canvas.getContext("2d");
 
 			// square in which the graph will be drawn
-			ctx.strokeRect(0, 50, 750, 350);
+			ctx.strokeRect(0, 50, 800, 400);
 
-			//title of graph in personalised font
-			ctx.font = '26px sans-serif'
-			ctx.fillText("Average temperature in 0.1\xB0C Berkhout, the Netherlands (2018)", 0, 40);
+			// title of graph
+			ctx.font = '26px sans-serif';
+			ctx.textAlign = 'center';
+			ctx.fillText("Average temperature in \xB0C Berkhout, the Netherlands (2018)", 375, 40);
 
-			function createLines(y) {
-				//makes lines starting from 0 
+
+			function createYLines(y) {
+				// makes labeled lines in scale to data
 				ctx.beginPath();
 				ctx.strokeStyle = 'grey';
 				ctx.font = '15px sans-serif'
+				ctx.textAlign = 'right';
 
-				var x1 = 25;
-				var x2 = 725;
-				var space = 50;
-				var lines1 = 10;
-				var yTemp = -15;
-				for(var i = 0; i < lines1; i++) {
+				var x1 = 75;		// outer left x
+				var x2 = 775;		// outer right x
+				var yTemp = -15;	// start temperature label
+
+				// creates a line and with label for every value in y
+				for(var i = 0; i < y.length; i++) {
 					ctx.moveTo(x1, y[i]);
 					ctx.lineTo(x2, y[i]);
-					ctx.fillText(yTemp, 10, y[i])
+					ctx.fillText(yTemp, x1, y[i]-2)
 					yTemp = yTemp + 5;
 				}
-				ctx.moveTo(25, 100);
-				ctx.stroke();	
+				ctx.font = '20px sans-serif'
+				ctx.fillText("T(\xB0C)",55 , 227.5)
+				ctx.stroke();
+			}
+
+			function createXLines(x) {
+				ctx.beginPath();
+				ctx.strokeStyle = 'grey';
+				ctx.font = '10px sans-serif'
+				ctx.textAlign = 'center';
+
+				var y1 = 55;
+				var y2 = 400;
+				var xDays = 1;
+
+				for(var i = 0; i < x.length; i++) {
+					ctx.moveTo(x[i], y1)
+					ctx.lineTo(x[i], y2)
+					ctx.fillText(i, x[i], y2+10)
+				}
+				ctx.font = '20px sans-serif'
+				ctx.fillText("Weeks starting at 01-01-2018", 425, 440)
+				ctx.stroke();
+			}
+
+
+			function createZeroLine(zero) {
+				ctx.beginPath();
+				ctx.strokeStyle = 'black';
+				ctx.lineWidth = '2';
+				ctx.moveTo(75, zero);
+				ctx.lineTo(775, zero);
+				ctx.stroke();
 			}
 		</script>
 	</body>
