@@ -1,7 +1,10 @@
 <!--
 Name: Ruby Bron
 Studenid: 12474223
+Data source: http://projects.knmi.nl/klimatologie/daggegevens/selectie.cgi
 This file creates a line chart from a json datafile
+
+I would like to use the one time only wild card for this exercise
 -->
 <!DOCTYPE html>
 <html>
@@ -39,14 +42,14 @@ This file creates a line chart from a json datafile
 				console.log(domain);
 
 				yScreen = createTransform(domain, range)
-				yZero = yScreen(0)
+				yLine = [yScreen(-150), yScreen(-100), yScreen(-50), yScreen(0), yScreen(50), yScreen(100), yScreen(150), yScreen(200), yScreen(250), yScreen(300),]
 
 				Object.keys(json).forEach(function(element) {
 					yRange.push(yScreen(json[element]["TG"]))
 				})
 
 				createDataLines(yRange, json)
-				createLines(yZero)
+				createLines(yLine)
 			}
 
 			// this finds the alpha and beta
@@ -105,33 +108,26 @@ This file creates a line chart from a json datafile
 			ctx.font = '26px sans-serif'
 			ctx.fillText("Average temperature in 0.1\xB0C Berkhout, the Netherlands (2018)", 0, 40);
 
-			function createLines(zero) {
-				//
+			function createLines(y) {
+				//makes lines starting from 0 
 				ctx.beginPath();
 				ctx.strokeStyle = 'grey';
+				ctx.font = '15px sans-serif'
 
 				var x1 = 25;
 				var x2 = 725;
-				var y = zero;
-				ctx.fillText("0", 10, zero)
 				var space = 50;
-				var lines1 = 5;
-				var lines2 = 5;
+				var lines1 = 10;
+				var yTemp = -15;
 				for(var i = 0; i < lines1; i++) {
-					ctx.moveTo(x1, y);
-					ctx.lineTo(x2, y);
-					y = y + space;
-				};
-				y = zero;
-				for(var i = 0; i < lines2; i++) {
-					ctx.moveTo(x1, y);
-					ctx.lineTo(x2, y);
-					y = y - space;
-				};
+					ctx.moveTo(x1, y[i]);
+					ctx.lineTo(x2, y[i]);
+					ctx.fillText(yTemp, 10, y[i])
+					yTemp = yTemp + 5;
+				}
 				ctx.moveTo(25, 100);
 				ctx.stroke();	
 			}
-		
 		</script>
 	</body>
 </html>
