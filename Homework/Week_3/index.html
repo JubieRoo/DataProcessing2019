@@ -54,7 +54,7 @@ I would like to use the one time only wild card for this exercise
 					if (element % 7 === 0) {
 						xLine.push(counter * 1.85 + 100);
 						counter = counter + 7;
-					}
+					};
 				});
 
 				// creates a list with all temperature data
@@ -91,7 +91,7 @@ I would like to use the one time only wild card for this exercise
 				// returns the function for the linear transformation (y= a * x + b)
 				return function(x){
 					return alpha * x + beta;
-				}
+				};
 			}
 
 
@@ -112,8 +112,8 @@ I would like to use the one time only wild card for this exercise
 				// creates the line using the transformed data
 				ctx.moveTo(xRange[0], y[0])
 				for (var i = 0; i < datapoints; i++) {
-					ctx.lineTo(xRange[i], y[i])
-				}
+					ctx.lineTo(xRange[i], y[i]);
+				};
 				ctx.stroke();
 			}
 
@@ -154,27 +154,30 @@ I would like to use the one time only wild card for this exercise
 			}
 
 			function createXLines(x) {
+				// creates vertical guide lines with labels for the line graph
 				ctx.beginPath();
 				ctx.strokeStyle = 'grey';
-				ctx.font = '10px sans-serif'
+				ctx.font = '10px sans-serif';
 				ctx.textAlign = 'center';
 
-				var y1 = 55;
-				var y2 = 400;
-				var xDays = 1;
+				var y1 = 55;		// topmost y
+				var y2 = 400;		// bottommost y
+				var xDays = 1;		// start week label
 
+				// creates a line per week and writes the week number underneath
 				for(var i = 0; i < x.length; i++) {
-					ctx.moveTo(x[i], y1)
-					ctx.lineTo(x[i], y2)
-					ctx.fillText(i, x[i], y2+10)
-				}
-				ctx.font = '20px sans-serif'
-				ctx.fillText("Weeks starting at 01-01-2018", 425, 440)
+					ctx.moveTo(x[i], y1);
+					ctx.lineTo(x[i], y2);
+					ctx.fillText(i, x[i], y2+10);
+				};
+				ctx.font = '20px sans-serif';
+				ctx.fillText("Weeks starting at 01-01-2018", 425, 440);
 				ctx.stroke();
 			}
 
 
 			function createZeroLine(zero) {
+				// creates an accentuated line at y = 0
 				ctx.beginPath();
 				ctx.strokeStyle = 'black';
 				ctx.lineWidth = '2';
