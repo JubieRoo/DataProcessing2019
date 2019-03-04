@@ -11,12 +11,20 @@ This file creates a bar-chart with a D3 library
 <html>
 	<head>
   		<meta charset="utf-8">
-    	<title>Soil fauna in Dunes areas, the Netherlands</title>
-    	<script type="text/javascript" src="d3/d3.v3.js"></script>
+    	<title>Soil fauna in Dunes, the Netherlands</title>
+    	<script type="text/javascript" src="d3/d3.js"></script>
 	</head>
 	<body>
+		<div class="header">
+ 			<h1>Soil fauna in Dunes, the Netherlands</h1>
+  			<p>OMG it's a bar chart made by Ruby Bron (student number: 12474223)</p>
+		</div>
   		<script type="text/javascript">
+  			d3.select("body").append("p").text("This is a bar chart made with the D3 library for the course: Data processing. It is made using a dataset acquired from WUR. This dataset contains data about the number of soil insects in three dune area's in the West of the Netherlands.");
   			// D3 bar chart will go here
+  			d3.csv("Bodem_Fauna_Duinen.csv").then(function(data) {
+  				console.log(data[0]);
+  			});
     	</script>
 	</body>
 </html>
