@@ -13,18 +13,58 @@ This file creates a bar-chart with a D3 library
   		<meta charset="utf-8">
     	<title>Soil fauna in Dunes, the Netherlands</title>
     	<script type="text/javascript" src="d3/d3.js"></script>
+
 	</head>
 	<body>
 		<div class="header">
  			<h1>Soil fauna in Dunes, the Netherlands</h1>
   			<p>OMG it's a bar chart made by Ruby Bron (student number: 12474223)</p>
+  			<p>This is a bar chart made with the D3 library for the course: Data processing. It is made using a dataset acquired from WUR. This dataset contains data about the number of soil insects in three dune area's in the West of the Netherlands.</p>
 		</div>
   		<script type="text/javascript">
-  			d3.select("body").append("p").text("This is a bar chart made with the D3 library for the course: Data processing. It is made using a dataset acquired from WUR. This dataset contains data about the number of soil insects in three dune area's in the West of the Netherlands.");
-  			// D3 bar chart will go here
-  			d3.csv("Bodem_Fauna_Duinen.csv").then(function(data) {
-  				console.log(data[0]);
-  			});
+
+
+  			var fileName = "data.json";
+			var txtFile = new XMLHttpRequest();
+			txtFile.onreadystatechange = function() {
+    			if (txtFile.readyState === 4 && txtFile.status == 200) {
+        			var json = JSON.parse(txtFile.responseText);
+        			bindData(json);
+    			};
+			};
+			txtFile.open("GET", fileName);
+			txtFile.send();	
+
+
+			function bindData(file) {
+				// binds the data to all p values
+				d3.select("body").selectAll("p")
+    			  .data(file)
+    			  .enter()
+    			  .append("p")
+    			  .text(function(d) { return d.individualCount; });;
+
+				createCircle(file);
+			};
+
+			//Width and height SVG
+			var w = 500;
+			var h = 50;
+
+			// create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+
+			function createCircle(file) {
+				// creates bars with own data input
+				var bars = svg.selectAll("bar")
+	                 .data(file)
+	                 .enter()
+	                 .append("bar");
+			}
     	</script>
 	</body>
 </html>
