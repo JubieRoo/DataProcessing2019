@@ -18,8 +18,8 @@ This file creates a bar-chart with a D3 library
 	<body>
 		<div class="header">
  			<h1>Soil fauna in Dunes, the Netherlands</h1>
-  			<p>OMG it's a bar chart made by Ruby Bron (student number: 12474223)</p>
-  			<p>This is a bar chart made with the D3 library for the course: Data processing. It is made using a dataset acquired from WUR. This dataset contains data about the number of soil insects in three dune area's in the West of the Netherlands.</p>
+  			<p>Bar chart made by Ruby Bron (student number: 12474223)</p>
+  			<p>This is a bar chart made with the D3 library for the course: Data processing. It is made using a dataset acquired from WUR. This dataset contains data about the number of soil insects in dune area's in the West of the Netherlands. The bar-chart shows the number of found insects per determination index.</p>
 		</div>
   		<script type="text/javascript">
 
@@ -37,14 +37,16 @@ This file creates a bar-chart with a D3 library
 
 
 			function bindData(file) {
-				// binds the data to all p values
+				// binds the data to all p values so it can be used to create the bars
 				d3.select("body").selectAll("p")
     			  .data(file)
     			  .enter()
     			  .append("p");
 
-				createCircle(file);
+    			// calls a function to create a bar chart
+				createBars(file);
 			};
+
 
 			//Width and height SVG
 			var w = 100;
@@ -59,24 +61,37 @@ This file creates a bar-chart with a D3 library
 						.attr("height", h);
 
 
-			function createCircle(file) {
-				// creates bars with own data input
+
+
+
+			function createBars(data) {
+				// creates minimum and max values
+				var xScale = d3.scale.linear()
+                     				 .domain([0, d3.max(d3.values(data), function(d) { return d[0];})])
+                     				 .range([0, w]);
+                var yScale = d3.scale.linear()
+                     				 .domain([0, d3.max(d3.values(data), function(d) { return d[1]; })])
+                     				 .range([0, h]);
+				// creates empty bars in svg with data input
 				var bars = svg.selectAll("rect")
-	            			  .data(file)
+	            			  .data(data)
 	                 		  .enter()
 	                 		  .append("rect");
 
+	            // draws the bars with data input
 	            bars.attr("y", function(d) {
-    				return h - d.individualCount * 4;
+    				return h - d.individualCount * 5;
     			})
 		        	.attr("x", function(d, i) {
 		           	return i * (w / datasetLenght);
 		        })
 		        	.attr("width", w / datasetLenght - barPadding)
 		        	.attr("height", function(d) {
-		        	return d.individualCount * 4;
-		        });
-
+		        	return d.individualCount * 5;
+		        })
+		        	.attr("fill", function(d) {
+				    return "rgb(0, 0, " + (d.individualCount * 20) + ")";
+				});
 			}
     	</script>
 	</body>
