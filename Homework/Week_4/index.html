@@ -47,8 +47,10 @@ This file creates a bar-chart with a D3 library
 			};
 
 			//Width and height SVG
-			var w = 500;
-			var h = 50;
+			var w = 100;
+			var h = 100;
+			var barPadding = 1;
+			var datasetLenght = 5;
 
 			// create SVG element
 			var svg = d3.select("body")
@@ -59,19 +61,21 @@ This file creates a bar-chart with a D3 library
 
 			function createCircle(file) {
 				// creates bars with own data input
-				var circles = svg.selectAll("rect")
-	                 .data(file)
-	                 .enter()
-	                 .append("rect");
+				var bars = svg.selectAll("rect")
+	            			  .data(file)
+	                 		  .enter()
+	                 		  .append("rect");
 
-	            circles.attr("x", function(d, i) {
-		           	return (i * 50) + 25;
+	            bars.attr("y", function(d) {
+    				return h - d.individualCount * 4;
+    			})
+		        	.attr("x", function(d, i) {
+		           	return i * (w / datasetLenght);
 		        })
-		        	   .attr("y", 0)
-		        	   .attr("width", 25)
-		        	   .attr("height", function(d) {
-		       		return d.individualCount * 2;
-		       });
+		        	.attr("width", w / datasetLenght - barPadding)
+		        	.attr("height", function(d) {
+		        	return d.individualCount * 4;
+		        });
 
 			}
     	</script>
