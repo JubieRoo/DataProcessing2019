@@ -61,17 +61,16 @@ This file creates a bar-chart with a D3 library
 						.attr("height", h);
 
 
-
-
-
 			function createBars(data) {
 				// creates minimum and max values
-				var xScale = d3.scale.linear()
-                     				 .domain([0, d3.max(d3.values(data), function(d) { return d[0];})])
-                     				 .range([0, w]);
-                var yScale = d3.scale.linear()
-                     				 .domain([0, d3.max(d3.values(data), function(d) { return d[1]; })])
-                     				 .range([0, h]);
+				// var xScale = d3.scale.linear()
+    			// .domain([0, d3.max(d3.values(data), function(d) { return d[0];})])
+    			// .range([0, w]);
+    			// var yScale = d3.scale.linear()
+    			// .domain([0, d3.max(d3.values(data), function(d) { return d[1]; })])
+    			// .range([0, h]);
+				// 
+
 				// creates empty bars in svg with data input
 				var bars = svg.selectAll("rect")
 	            			  .data(data)
