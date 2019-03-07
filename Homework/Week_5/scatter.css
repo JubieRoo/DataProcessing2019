@@ -1,0 +1,14 @@
+/*
+Name: Ruby Bron
+Studenid: 12474223
+This file will change the look of the website created by scatter.html
+*/
+
+body {
+  background-color: lightblue;
+}
+
+h1 {
+  color: navy;
+  margin-left: 20px;
+}
