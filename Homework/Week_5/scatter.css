@@ -4,11 +4,23 @@ Studenid: 12474223
 This file will change the look of the website created by scatter.html
 */
 
+.axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+
+.axis text {
+	font-family: sans-serif;
+	font-size: 11px;
+}
+
 body {
-  background-color: lightblue;
+  	background-color: powderblue;
 }
 
 h1 {
-  color: navy;
-  margin-left: 20px;
+  	color: navy;
+  	margin-left: 20px;
 }

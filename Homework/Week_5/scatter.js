@@ -6,12 +6,27 @@ This file contains all the functions to create a scatterplot
 */
 
 window.onload = function() {
-	// this function starts when the webpage is opened and calls other functions
-	data = getDataPC();
+	// opens the json files and calls other functions working with that datafile
+
+	// data needed for scatterplot local data is used because of a block by the APIserver
+	var tourismInbound = "data/tourists.json";
+	var purchasingPowerParities = "data/ppp.json";
+	var grossDomesticProduct = "data/gdp.json";
+
+	// loads the data then executes functions using it
+	Promise.all([
+		d3.json(tourismInbound),
+		d3.json(purchasingPowerParities),
+		d3.json(grossDomesticProduct)
+		]).then(function(data) {
+			var dataTransformed = transformData(data);
+			var scatterPlot = createScatter(data);
+		}
+	);
 };
 
 function getDataAPI() {
-	// this function acquires the data from an API
+	// this function acquires the data from an API 
 
 	// API links
 	var tourismInbound = "https://stats.oecd.org/SDMX-JSON/data/TOURISM_INBOUND/AUS+AUT+BEL+BEL-BRU+BEL-VLG+BEL-WAL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+EGY+MKD+IND+IDN+MLT+MAR+PER+PHL+ROU+RUS+ZAF.INB_ARRIVALS_TOTAL/all?startTime=2009&endTime=2017"
@@ -32,17 +47,99 @@ function getDataAPI() {
 	});
 };
 
-function getDataPC() {
-	var tourismInbound = "data/tourists.json";
-	var purchasingPowerParities = "data/ppp.json";
-	var grossDomesticProduct = "data/gdp.json";
-
-	
-
+function transformData(data) {
+	return data;
 };
 
+
+function createScatter(data) {
+	console.log(data);
+
+	var dataset = [
+                	[5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
+                	[410, 12], [475, 44], [25, 67], [85, 21], [220, 88], [600, 150]
+              	  ];
+
+    var w = 500;
+    var h = 300;
+    var padding = 30;
+
+	// create scales
+    var xScale = d3.scaleLinear()
+		 		   .domain([0, d3.max(dataset, function(d) { return d[0]; })])
+	     		   .range([padding, w - padding * 2]);
+
+	var yScale = d3.scaleLinear()
+		 		   .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+	     		   .range([h - padding, padding]);
+
+	var rScale = d3.scaleLinear()
+                   .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+                   .range([2, 5]);
+    // create axis
+    var xAxis = d3.axisBottom(xScale)
+    			  .ticks(5);
+    var yAxis = d3.axisLeft(yScale)
+    			  .ticks(5);
+
+ 	// create SVG element
+	var svg = d3.select("body")
+            	.append("svg")
+            	 .attr("width", w)
+            	 .attr("height", h);
+
+
+
+	// create circles
+	svg.selectAll("circle")
+	   .data(dataset)
+       .enter()
+       .append("circle")
+       .attr("cx", function(d) {
+        	return xScale(d[0]);
+   	   })
+   	   .attr("cy", function(d) {
+        	return yScale(d[1]);
+   	   })
+       .attr("r", function(d) {
+    		return rScale(d[1]);
+	   });
+
+    // create labels
+	// svg.selectAll("text")
+	//    .data(dataset)
+	//    .enter()
+	//    .append("text")
+	//    .text(function(d) {
+	//    		return d[0] + "," + d[1];
+	//    })
+	//    .attr("x", function(d) {
+ //        	return xScale(d[0]);
+ //   	   })
+ //   	   .attr("y", function(d) {
+ //        	return yScale(d[1]);
+ //   	   })
+ //   	   .attr("font-family", "sans-serif")
+ //   	   .attr("font-size", "11px")
+ //   	   .attr("fill", "red");
+
+	// create X axis
+    svg.append("g")
+       .attr("class", "axis")
+       .attr("transform", "translate(0," + (h - padding) + ")")
+       .call(xAxis);
+
+    // create Y axis
+    svg.append("g")
+       .attr("class", "axis")
+       .attr("transform", "translate(" + padding + ",0)")
+       .call(yAxis);     		  
+};
+
+
+
 function formatTI() {
-	/********
+/********
  * Transforms response of OECD request for inbound tourism.
  * https://stats.oecd.org/SDMX-JSON/data/TOURISM_INBOUND/AUS+AUT+BEL+BEL-BRU+BEL-VLG+BEL-WAL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+EGY+MKD+IND+IDN+MLT+MAR+PER+PHL+ROU+RUS+ZAF.INB_ARRIVALS_TOTAL/all?startTime=2008&endTime=2017
  **/
@@ -113,6 +210,7 @@ function formatTI() {
     // return the finished product!
     return dataObject;
 };
+
 
 function formatPPP(data) {
 /********
