@@ -20,10 +20,12 @@ window.onload = function() {
 		d3.json(grossDomesticProduct)
 		]).then(function(data) {
 			var dataTransformed = transformData(data);
+			var scatterData = createPlotData(data, 2012, 2);
 			var scatterPlot = createScatter(data);
 		}
 	);
 };
+
 
 function getDataAPI() {
 	// this function acquires the data from an API 
@@ -39,23 +41,48 @@ function getDataAPI() {
 	// (response[0]["dataSets"][0]["series"]["0:0"]) <-- voor vinden data API
 	Promise.all(requests).then(function(response) {
 		formatTI(response[0]);
-		formatPPP(response[2]);
-		formatGDP(response[3]);
+		formatPPP(response[1]);
+		formatGDP(response[2]);
 	}).catch(function(e){
 		console.log(e);
     	throw(e);
 	});
 };
 
+
 function transformData(data) {
+	var countryInformation = {};
+	for (var dataset in data) {
+		for (var country in data[dataset]) {
+			for (var element in data[dataset][country]) {
+				if (data[dataset][country][element]["Year"] == undefined)
+					console.log(data[dataset][country][element]["Time"])
+				else 
+					console.log(data[dataset][country][element]["Year"])
+			}
+		}
+	}
 	return data;
 };
 
 
-function createScatter(data) {
-	console.log(data);
+function createPlotData(transformedData, year, variableX, variableY) {
+	// transformedData = data[variable];
 
-	var dataset = [
+	// for (var country in dataset) {
+	// 	console.log(country);
+	// 	for (var element in dataset[country]) {
+	// 		console.log(dataset[country][element].Year);
+	// 	}
+	// }	
+
+
+	return [];
+}
+
+
+function createScatter(data) {
+	var data = [
                 	[5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
                 	[410, 12], [475, 44], [25, 67], [85, 21], [220, 88], [600, 150]
               	  ];
@@ -66,15 +93,15 @@ function createScatter(data) {
 
 	// create scales
     var xScale = d3.scaleLinear()
-		 		   .domain([0, d3.max(dataset, function(d) { return d[0]; })])
+		 		   .domain([0, d3.max(data, function(d) { return d[0]; })])
 	     		   .range([padding, w - padding * 2]);
 
 	var yScale = d3.scaleLinear()
-		 		   .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+		 		   .domain([0, d3.max(data, function(d) { return d[1]; })])
 	     		   .range([h - padding, padding]);
 
 	var rScale = d3.scaleLinear()
-                   .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+                   .domain([0, d3.max(data, function(d) { return d[1]; })])
                    .range([2, 5]);
     // create axis
     var xAxis = d3.axisBottom(xScale)
@@ -92,7 +119,7 @@ function createScatter(data) {
 
 	// create circles
 	svg.selectAll("circle")
-	   .data(dataset)
+	   .data(data)
        .enter()
        .append("circle")
        .attr("cx", function(d) {
@@ -103,7 +130,9 @@ function createScatter(data) {
    	   })
        .attr("r", function(d) {
     		return rScale(d[1]);
-	   });
+	   })
+	   .attr("fill", "None")
+	   .attr("stroke", "black");
 
     // create labels
 	// svg.selectAll("text")
@@ -111,7 +140,7 @@ function createScatter(data) {
 	//    .enter()
 	//    .append("text")
 	//    .text(function(d) {
-	//    		return d[0] + "," + d[1];
+	//    		return "Australia";
 	//    })
 	//    .attr("x", function(d) {
  //        	return xScale(d[0]);
