@@ -1,27 +1,40 @@
 /*
 Name: Ruby Bron
 Studenid: 12474223
-Data source: 
-This file contains all the functions to create a scatterplot
+Data sources: 
+	https://data.mprog.nl/course/10%20Homework/100%20D3%20Scatterplot/datasets/tourists.json
+	https://data.mprog.nl/course/10%20Homework/100%20D3%20Scatterplot/datasets/ppp.json
+	https://data.mprog.nl/course/10%20Homework/100%20D3%20Scatterplot/datasets/gdp.json
+This file creates a scatterplot, the only problem is that I can't access the API. 
+So I created the scatterplot with the data available on the courses website.
+I did leave the function that should get data from the API available for use, but I haven't been able to test if it works the same. 
 */
 
 window.onload = function() {
-	// opens the json files and calls other functions working with that datafile
+	// this function is called when the webpage is opened and calls the function that eventually creates a scatterplot from API data 
+	getDataPC();
+};
 
+function getDataPC() {
 	// data needed for scatterplot local data is used because of a block by the APIserver
 	var tourismInbound = "data/tourists.json";
 	var purchasingPowerParities = "data/ppp.json";
 	var grossDomesticProduct = "data/gdp.json";
 
-	// loads the data then executes functions using it
+	// variables needed to create scatter data
+	var xAxis = 1; 
+	var yAxis = 2;
+	var year = 2012;
+
+	// loads the data, transforms it and than creates a scatterplot with it
 	Promise.all([
 		d3.json(tourismInbound),
 		d3.json(purchasingPowerParities),
 		d3.json(grossDomesticProduct)
 		]).then(function(data) {
 			var dataTransformed = transformData(data);
-			var scatterData = createPlotData(data, 2012, 2);
-			var scatterPlot = createScatter(data);
+			var scatterData = createPlotData(dataTransformed, year, xAxis, yAxis);
+			var scatterPlot = createScatter(scatterData, xAxis, yAxis);
 		}
 	);
 };
@@ -31,19 +44,29 @@ function getDataAPI() {
 	// this function acquires the data from an API 
 
 	// API links
-	var tourismInbound = "https://stats.oecd.org/SDMX-JSON/data/TOURISM_INBOUND/AUS+AUT+BEL+BEL-BRU+BEL-VLG+BEL-WAL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+EGY+MKD+IND+IDN+MLT+MAR+PER+PHL+ROU+RUS+ZAF.INB_ARRIVALS_TOTAL/all?startTime=2009&endTime=2017"
-	var purchasingPowerParities = "https://stats.oecd.org/SDMX-JSON/data/PPPGDP/PPP.AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA18+OECD/all?startTime=2009&endTime=2017&dimensionAtObservation=allDimensions"
-	var grossDomesticProduct = "https://stats.oecd.org/SDMX-JSON/data/SNA_TABLE1/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU28+OECD+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+SAU+ZAF.B1_GA.C/all?startTime=2012&endTime=2018&dimensionAtObservation=allDimensions"
+	var tourismInboundAPI = "https://stats.oecd.org/SDMX-JSON/data/TOURISM_INBOUND/AUS+AUT+BEL+BEL-BRU+BEL-VLG+BEL-WAL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+EGY+MKD+IND+IDN+MLT+MAR+PER+PHL+ROU+RUS+ZAF.INB_ARRIVALS_TOTAL/all?startTime=2009&endTime=2017"
+	var purchasingPowerParitiesAPI = "https://stats.oecd.org/SDMX-JSON/data/PPPGDP/PPP.AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA18+OECD/all?startTime=2009&endTime=2017&dimensionAtObservation=allDimensions"
+	var grossDomesticProductAPI = "https://stats.oecd.org/SDMX-JSON/data/SNA_TABLE1/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU28+OECD+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+SAU+ZAF.B1_GA.C/all?startTime=2012&endTime=2018&dimensionAtObservation=allDimensions"
+	
 	// requests json files
-	var requests = [d3.json(tourismInbound), d3.json(purchasingPowerParities), d3.json(grossDomesticProduct)];
+	var requests = [d3.json(tourismInboundAPI), d3.json(purchasingPowerParitiesAPI), d3.json(grossDomesticProductAPI)];
 
-	// waits till requests are fulfilled and then executes a function
-	// (response[0]["dataSets"][0]["series"]["0:0"]) <-- voor vinden data API
+	// variables needed to create scatter data
+	var xAxis = 1; 
+	var yAxis = 2;
+	var year = 2012;
+
+	// loads the data, transforms it and than creates a scatterplot with it
 	Promise.all(requests).then(function(response) {
-		formatTI(response[0]);
-		formatPPP(response[1]);
-		formatGDP(response[2]);
-	}).catch(function(e){
+		TI = formatTI(response[0]);
+		PPP = formatPPP(response[1]);
+		GDP = formatGDP(response[2]);
+		data = [TI, PPP, GDP];
+
+		var dataTransformed = transformData(data);
+		var scatterData = createPlotData(dataTransformed, year, xAxis, yAxis);
+		var scatterPlot = createScatter(scatterData, xAxis, yAxis);
+	}).catch(function(e) {
 		console.log(e);
     	throw(e);
 	});
@@ -52,57 +75,71 @@ function getDataAPI() {
 
 function transformData(data) {
 	var countryInformation = {};
+	var result = {};
+
 	for (var dataset in data) {
 		for (var country in data[dataset]) {
 			for (var element in data[dataset][country]) {
-				if (data[dataset][country][element]["Year"] == undefined)
-					console.log(data[dataset][country][element]["Time"])
-				else 
-					console.log(data[dataset][country][element]["Year"])
-			}
+				// create local variables for dictionary
+				var year = data[dataset][country][element].Year || data[dataset][country][element].Time;
+				var country = data[dataset][country][element]["Country"];
+				var datapoint = data[dataset][country][element]["Datapoint"];
+
+				if (!result[year]) {
+					result[year] = {};
+				}
+				if (!result[year][country]) {
+					result[year][country] = [NaN, NaN, NaN];
+				}
+				result[year][country][dataset] = datapoint;	
+			}	
 		}
 	}
-	return data;
+	return result;
 };
 
 
 function createPlotData(transformedData, year, variableX, variableY) {
-	// transformedData = data[variable];
-
-	// for (var country in dataset) {
-	// 	console.log(country);
-	// 	for (var element in dataset[country]) {
-	// 		console.log(dataset[country][element].Year);
-	// 	}
-	// }	
-
-
-	return [];
+	valuesXY = [];
+	countries = [];
+	for (var country in transformedData[year]) {
+		x = transformedData[year][country][variableX];
+		y = transformedData[year][country][variableY];
+		if (!Number.isNaN(x) && !Number.isNaN(y)) {
+			valuesXY.push([x, y]);
+			countries.push(country)
+		};
+	}
+	return [valuesXY, countries];
 }
 
 
-function createScatter(data) {
-	var data = [
-                	[5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
-                	[410, 12], [475, 44], [25, 67], [85, 21], [220, 88], [600, 150]
-              	  ];
+function createScatter(data, x, y) {
+	/*
+	this function creates a scatterplot complete with legend and scales on a svg element
+	*/
 
-    var w = 500;
-    var h = 300;
-    var padding = 30;
+	// country data
+	var countries = data[1];
+
+	// size variables 
+    var w = 960;
+    var h = 540;
+    var padding = 100;
 
 	// create scales
-    var xScale = d3.scaleLinear()
-		 		   .domain([0, d3.max(data, function(d) { return d[0]; })])
+    var xScale = d3.scaleLog()
+    	 		   .domain([d3.min(data[0], xy => xy[0]), d3.max(data[0], xy => xy[0])])
 	     		   .range([padding, w - padding * 2]);
 
-	var yScale = d3.scaleLinear()
-		 		   .domain([0, d3.max(data, function(d) { return d[1]; })])
+	var yScale = d3.scaleLog()
+		 		   .domain([d3.min(data[0], xy => xy[1]), d3.max(data[0], xy => xy[1])])
 	     		   .range([h - padding, padding]);
 
 	var rScale = d3.scaleLinear()
-                   .domain([0, d3.max(data, function(d) { return d[1]; })])
-                   .range([2, 5]);
+                   .domain([0, d3.max(data[0], function(d) { return d[1]; })])
+                   .range([2, 10]);
+
     // create axis
     var xAxis = d3.axisBottom(xScale)
     			  .ticks(5);
@@ -115,11 +152,9 @@ function createScatter(data) {
             	 .attr("width", w)
             	 .attr("height", h);
 
-
-
 	// create circles
 	svg.selectAll("circle")
-	   .data(data)
+	   .data(data[0])
        .enter()
        .append("circle")
        .attr("cx", function(d) {
@@ -128,29 +163,29 @@ function createScatter(data) {
    	   .attr("cy", function(d) {
         	return yScale(d[1]);
    	   })
-       .attr("r", function(d) {
-    		return rScale(d[1]);
-	   })
+       .attr("r", 2)
 	   .attr("fill", "None")
-	   .attr("stroke", "black");
+	   .attr("stroke", "Teal");
 
     // create labels
-	// svg.selectAll("text")
-	//    .data(dataset)
-	//    .enter()
-	//    .append("text")
-	//    .text(function(d) {
-	//    		return "Australia";
-	//    })
-	//    .attr("x", function(d) {
- //        	return xScale(d[0]);
- //   	   })
- //   	   .attr("y", function(d) {
- //        	return yScale(d[1]);
- //   	   })
- //   	   .attr("font-family", "sans-serif")
- //   	   .attr("font-size", "11px")
- //   	   .attr("fill", "red");
+	svg.selectAll("text")
+	   .data(data[0])
+	   .enter()
+	   .append("text")
+	   .text(function(d, i) {
+	   	console.log(countries[i])
+	   		return countries[i];
+	   })
+	   .attr("x", function(d) {
+        	return xScale(d[0]);
+   	   })
+   	   .attr("y", function(d) {
+        	return yScale(d[1]);
+   	   })
+   	   .attr("font-family", "sans-serif")
+   	   .attr("font-size", "11px")
+   	   .attr("fill", "Black");
+
 
 	// create X axis
     svg.append("g")
@@ -167,7 +202,7 @@ function createScatter(data) {
 
 
 
-function formatTI() {
+function formatTI(data) {
 /********
  * Transforms response of OECD request for inbound tourism.
  * https://stats.oecd.org/SDMX-JSON/data/TOURISM_INBOUND/AUS+AUT+BEL+BEL-BRU+BEL-VLG+BEL-WAL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+EGY+MKD+IND+IDN+MLT+MAR+PER+PHL+ROU+RUS+ZAF.INB_ARRIVALS_TOTAL/all?startTime=2008&endTime=2017
@@ -237,6 +272,7 @@ function formatTI() {
     });
 
     // return the finished product!
+    console.log(dataObject);
     return dataObject;
 };
 
@@ -310,10 +346,11 @@ function formatPPP(data) {
     });
 
     // return the finished product!
+    console.log(dataObject);
     return dataObject;
 };
 
-function formatGDP() {
+function formatGDP(data) {
 /********
  * Transforms response of OECD request for GDP.
  * https://stats.oecd.org/SDMX-JSON/data/SNA_TABLE1/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU28+OECD+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+SAU+ZAF.B1_GA.C/all?startTime=2012&endTime=2018&dimensionAtObservation=allDimensions
@@ -381,5 +418,6 @@ function formatGDP() {
     });
 
     // return the finished product!
+    console.log(dataObject);
     return dataObject;
 };
