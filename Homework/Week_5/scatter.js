@@ -85,6 +85,7 @@ function transformData(data) {
 				var country = data[dataset][country][element]["Country"];
 				var datapoint = data[dataset][country][element]["Datapoint"];
 
+				// creates a dictionary structure: {year: {country: [var1, var2, var3]}}
 				if (!result[year]) {
 					result[year] = {};
 				}
@@ -102,15 +103,18 @@ function transformData(data) {
 function createPlotData(transformedData, year, variableX, variableY) {
 	valuesXY = [];
 	countries = [];
+	countriesAll = [];
 	for (var country in transformedData[year]) {
 		x = transformedData[year][country][variableX];
 		y = transformedData[year][country][variableY];
 		if (!Number.isNaN(x) && !Number.isNaN(y)) {
 			valuesXY.push([x, y]);
-			countries.push(country)
+			countries.push(country);
 		};
+		countriesAll.push(country);
 	}
-	return [valuesXY, countries];
+
+	return [valuesXY, countries, countriesAll];
 }
 
 
@@ -126,8 +130,13 @@ function createScatter(data, x, y) {
     var w = 960;
     var h = 540;
     var padding = 100;
+    var legendRectSize = 10;
+    var legendSpacing = 5;
 
-	// create scales
+    // create colour scale
+    var color = d3.interpolateRdYlBu;
+
+	// create graph scales
     var xScale = d3.scaleLog()
     	 		   .domain([d3.min(data[0], xy => xy[0]), d3.max(data[0], xy => xy[0])])
 	     		   .range([padding, w - padding * 2]);
@@ -163,9 +172,11 @@ function createScatter(data, x, y) {
    	   .attr("cy", function(d) {
         	return yScale(d[1]);
    	   })
-       .attr("r", 2)
-	   .attr("fill", "None")
-	   .attr("stroke", "Teal");
+       .attr("r", 5)
+	   .attr("fill", function(d, i) {
+	   		return color(i / countries.length)
+	   })
+	   .attr("stroke", "black");
 
     // create labels
 	svg.selectAll("text")
@@ -173,7 +184,6 @@ function createScatter(data, x, y) {
 	   .enter()
 	   .append("text")
 	   .text(function(d, i) {
-	   	console.log(countries[i])
 	   		return countries[i];
 	   })
 	   .attr("x", function(d) {
@@ -187,13 +197,12 @@ function createScatter(data, x, y) {
    	   .attr("fill", "Black");
 
 
-	// create X axis
+	// make axis visible
     svg.append("g")
        .attr("class", "axis")
        .attr("transform", "translate(0," + (h - padding) + ")")
-       .call(xAxis);
+       .call(xAxis);     
 
-    // create Y axis
     svg.append("g")
        .attr("class", "axis")
        .attr("transform", "translate(" + padding + ",0)")
