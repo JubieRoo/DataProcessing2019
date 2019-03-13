@@ -16,6 +16,10 @@ This file will change the look of the website created by scatter.html
 	font-size: 11px;
 }
 
+.legend {
+	font-size: 12px;
+}
+
 body {
   	background-color: powderblue;
 }
