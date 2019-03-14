@@ -41,7 +41,7 @@ function getDataPC() {
 		]).then(function(data) {
 			var dataTransformed = transformData(data);
 			var scatterData = createPlotData(dataTransformed, year, xAxis, yAxis);
-			var scatterPlot = createScatter(scatterData, xAxis, yAxis);
+			var scatterPlot = createScatter(scatterData, xAxis, yAxis, year);
 		}
 	);
 };
@@ -142,7 +142,7 @@ function createPlotData(transformedData, year, variableX, variableY) {
 }
 
 
-function createScatter(data, x, y) {
+function createScatter(data, x, y, year) {
 	/*
 	this function creates a scatterplot complete with legend and scales on a svg element
 	*/
@@ -209,7 +209,7 @@ function createScatter(data, x, y) {
 	   })
 	   .attr("stroke", "black");
 
- //    // create labels
+ //    // create labels for if I ever need them
 	// svg.selectAll("text")
 	//    .data(data[0])
 	//    .enter()
@@ -288,10 +288,68 @@ function createScatter(data, x, y) {
        .attr('x', w / 2)
        .attr('y', paddingY / 4)
        .style("text-anchor", "middle")
-       .text(xLabel + " tegenover " + yLabel);		  
+       .text(xLabel + " and " + yLabel + " in " + year);		  
 };
 
 
-function switchXAxis() {
-
+function showDropdown() {
+	document.getElementById("myDropdown").classList.toggle("show");
 };
+
+
+window.onclick = function(event) {
+	/*
+	This function closes the window created by the dropdown when the user clicks outside of it
+	*/
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    for (var i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+
+function updateData(year) {
+	/*
+	still under construction, this underneath is not my code
+	source: https://bl.ocks.org/mbostock/3808221
+	*/ 
+
+// 	var text = g.selectAll("text")
+//     .data(data, function(d) { return d; });
+
+//   // UPDATE
+//   // Update old elements as needed.
+//   text.attr("class", "update");
+
+//   // ENTER
+//   // Create new elements as needed.
+//   //
+//   // ENTER + UPDATE
+//   // After merging the entered elements with the update selection,
+//   // apply operations to both.
+//   text.enter().append("text")
+//       .attr("class", "enter")
+//       .attr("dy", ".35em")
+//       .text(function(d) { return d; })
+//     .merge(text)
+//       .attr("x", function(d, i) { return i * 32; });
+
+//   // EXIT
+//   // Remove old elements as needed.
+//   text.exit().remove();
+
+// // The initial display.
+// update(alphabet);
+
+// // Grab a random sample of letters from the alphabet, in alphabetical order.
+// d3.interval(function() {
+//   update(d3.shuffle(alphabet)
+//       .slice(0, Math.floor(Math.random() * 26))
+//       .sort());
+// 	}, 1500);
+
+}
