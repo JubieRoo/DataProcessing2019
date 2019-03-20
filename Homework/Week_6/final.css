@@ -4,12 +4,33 @@ Studenid: 12474223
 Data source: https://www.kaggle.com/new-york-state/nys-biodiversity-by-county
 This file creates the styling for the linked-views webpage
 */
+path {
+        fill: lightgray;
+        stroke: #000000;
+        stroke-width: 1.5;
+        }
+
+
+path:hover {
+        fill:orange;
+        cursor:pointer;
+      }
+
+#state-borders {
+  fill: white;
+  stroke: #000000;
+  stroke-width: 10.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
 
 body {
   	background-color: lavender;
 }
 
 h1 {
-  	color: lime;
+  	color: navy;
   	margin-left: 20px;
 }
