@@ -1,0 +1,15 @@
+/*
+Name: Ruby Bron
+Studenid: 12474223
+Data source: https://www.kaggle.com/new-york-state/nys-biodiversity-by-county
+This file creates the styling for the linked-views webpage
+*/
+
+body {
+  	background-color: lavender;
+}
+
+h1 {
+  	color: lime;
+  	margin-left: 20px;
+}
