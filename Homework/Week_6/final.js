@@ -7,7 +7,7 @@ This file contains the script for the creation of the plots (chloropleth and bar
 
 window.onload = function() {
 	var localData = "biodiversity-by-county-distribution-of-animals-plants-and-natural-communities.csv"
-	var choroplethMap = "us-albers-counties.json"
+	var choroplethMap = '/datamaps/NY-36-new-york-counties.json'
 	openData(localData, choroplethMap);
 	makeMap(choroplethMap);
 };
@@ -38,38 +38,25 @@ function createChoroplethData(data) {
 };
 
 
-function makeMap(map) {
-	var width = 960,
-    	height = 500,
-    	centered;
-
-	var projection =  d3v3.geoAlbersUsa()
-	    .scale(1370)
-	    .translate([width / 2, height / 2]);
-
-	var path = d3.geoPath()
-	    .projection(projection);
-
-	var svg = d3.select("body").append("svg")
-	    .attr("width", width)
-	    .attr("height", height);
-
-
-	d3.json(map,function(json){
-	    svg.selectAll("path")
-	       .attr("id", "state_fips")
-	       .data(topojson.feature(json, json.objects.collection).features.filter(function(d) { return d.properties.state_fips == 36; }))
-	       .enter()
-	       .append("path")
-	       .attr("d", path)
-	       .attr("stroke","white")
-	       .attr("fill", "gray");
+function makeMap(cMap) {
+	var map = new Datamap({
+		element: document.getElementById('container'),
+		geographyConfig: {dataUrl: 'https://raw.githubusercontent.com/deldersveld/topojson/master/countries/us-states/NY-36-new-york-counties.json'},
+		scope: 'cb_2015_new_york_county_20m',
+		setProjection: function(element, options) {
+			var projection = d3v3.geo.equirectangular()
+								 	 .center([-76, 43])
+								 	 .scale(3000)
+								 	 .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+			var path = d3v3.geo.path()
+							   .projection(projection);
+			return {path: path, projection: projection};
+		}
 	});
 };
 
 
 function createChoropleth(map, data) {
-	console.log(data[3]);
-	var map = new Datamap({element: document.getElementById('container')});
+	console.log(data[3])
 };
 	
