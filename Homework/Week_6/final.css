@@ -4,6 +4,7 @@ Studenid: 12474223
 Data source: https://www.kaggle.com/new-york-state/nys-biodiversity-by-county
 This file creates the styling for the linked-views webpage
 */
+
 path {
         fill: lightgray;
         stroke: #000000;

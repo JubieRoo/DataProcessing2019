@@ -16,7 +16,6 @@ window.onload = function() {
 function openData(data, choroplethMap) {
 	d3v5.csv(data).then(function(data) {
 		d3v5.json(choroplethMap).then(function(choroplethMap) {
-			console.log(data[0].County, data[0].Category, data[0]["Taxonomic Group"]);
 			var transformedData = transformData(data);
 			var choroplethData = createChoroplethData(transformedData);
 			createChoropleth(choroplethMap, choroplethData);	
@@ -27,22 +26,45 @@ function openData(data, choroplethMap) {
 
 
 function transformData(data) {
-	console.log(data);
-	return data;
+	// transforms the data into a usuable format
+	var resultSmall = {};
+	var diversity = {};
+	var taxonPerCounty = {};
+
+	for (var datapoint in data) {
+		var county = data[datapoint].County;
+		var category = data[datapoint].Category;
+		var taxGroup = data[datapoint]["Taxonomic Group"];
+		var species = data[datapoint]["Scientific Name"];
+
+		if (!resultSmall[county]) {
+			resultSmall[county] = [];
+		}
+		resultSmall[county].push(species);
+	}
+	for (var county in resultSmall) {
+		if (!diversity[county]) {
+			diversity[county] = [];
+		}
+		diversity[county] = resultSmall[county].length;
+	}
+	console.log(resultSmall, diversity);
+
+	return diversity;
 };
 
 
 function createChoroplethData(data) {
-	console.log(data[2]);
 	return data;
 };
 
 
 function makeMap(cMap) {
+// makes a custom map 
 	var map = new Datamap({
 		element: document.getElementById('container'),
-		geographyConfig: {dataUrl: 'https://raw.githubusercontent.com/deldersveld/topojson/master/countries/us-states/NY-36-new-york-counties.json'},
-		scope: 'cb_2015_new_york_county_20m',
+		geographyConfig: {dataUrl: "https://gist.githubusercontent.com/markmarkoh/8717334/raw/a226c312c4eb70de3ae3eed99e9337fb64edcee3/newyork-with-counties.json"},
+		scope: "subunits-ny",
 		setProjection: function(element, options) {
 			var projection = d3v3.geo.equirectangular()
 								 	 .center([-76, 43])
@@ -51,12 +73,20 @@ function makeMap(cMap) {
 			var path = d3v3.geo.path()
 							   .projection(projection);
 			return {path: path, projection: projection};
+		},
+		fills: {
+			HIGH: 'red',
+			defaultFill: 'green'
+		},
+		data: {
+			'071': {
+				fillKey: 'HIGH'
+			}
 		}
 	});
 };
 
 
 function createChoropleth(map, data) {
-	console.log(data[3])
 };
 	
