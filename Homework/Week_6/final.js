@@ -149,5 +149,33 @@ function makeChoropleth(mapData) {
 
 
 function makeBarchart(barData) {
-	console.log(barData);
+	// creates a svg with a barchart
+	var county = barData["Albany"];
+	var dataset = [];
+	var groupNames = [];
+	for (var value in county) {
+		dataset.push(county[value]);
+		groupNames.push(value);
+	}
+
+	// Width and height
+	var w = 500,
+		h = 100;
+
+	// create SVG element
+	var svg = d3v5.select("bar-chart")
+				  .append("svg")
+				  .attr("width", w)
+				  .attr("height", h);
+
+	// create rectangles
+	svg.selectAll("rect")
+   	   .data()
+   	   .enter()
+   	   .append("rect")
+   	   .attr("x", 0)
+       .attr("y", 0)
+       .attr("width", 20)
+       .attr("height", 100);
+
 };
