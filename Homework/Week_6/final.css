@@ -5,18 +5,6 @@ Data source: https://www.kaggle.com/new-york-state/nys-biodiversity-by-county
 This file creates the styling for the linked-views webpage
 */
 
-path {
-        fill: lightgray;
-        stroke: #000000;
-        stroke-width: 1.5;
-        }
-
-
-path:hover {
-        fill:orange;
-        cursor:pointer;
-      }
-
 #state-borders {
   fill: white;
   stroke: #000000;
@@ -49,14 +37,4 @@ path:hover {
     position: absolute;
     top:90px;
     left: 50px;
-}
-
-
-body {
-  	background-color: lavender;
-}
-
-h1 {
-  	color: navy;
-  	margin-left: 20px;
 }
