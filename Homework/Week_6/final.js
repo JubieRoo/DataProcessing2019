@@ -150,7 +150,7 @@ function makeChoropleth(mapData) {
 
 function makeBarchart(barData, countyName) {
 	// Creates a svg with a barchart
-	countyName = "Schoharie"
+	countyName = "New York"
 
 	// Some variables that we use later on
 	var county = barData[countyName];
@@ -165,7 +165,8 @@ function makeBarchart(barData, countyName) {
 	var w = 500,
 		h = 500,
 		barPadding = 1,
-		chartPaddingY = 100,
+		chartPaddingTop = 50,
+		chartPaddingBot = 150
 		chartPaddingX = 50,
 		dataLength = dataset.length;
 
@@ -184,7 +185,7 @@ function makeBarchart(barData, countyName) {
    	// create X/Y scales
    	var yScale = d3v5.scaleLinear()
    					 .domain([0, d3v5.max(dataset)])
-   					 .range([h - chartPaddingY, chartPaddingY]);
+   					 .range([h - chartPaddingBot, chartPaddingTop]);
 
 	var xScale = d3v5.scaleBand()
 					 .domain(groupNames)
@@ -207,7 +208,7 @@ function makeBarchart(barData, countyName) {
 		})
 		.attr("width", xScale.bandwidth())
 		.attr("height", function(d) {
-			return h - yScale(d) - chartPaddingY;
+			return h - yScale(d) - chartPaddingBot;
 		})
 		.attr("fill", function(d) {
 			return paletteScale(d);
@@ -215,7 +216,7 @@ function makeBarchart(barData, countyName) {
 
 	// initialize axis
 	var yAxis = d3v5.axisLeft(yScale)
-					.ticks(5);
+					.ticks(10);
 	var xAxis = d3v5.axisBottom(xScale)
 					.ticks(groupNames.lenght);
 
@@ -228,17 +229,52 @@ function makeBarchart(barData, countyName) {
     // create Y label
 	svg.append("text")             
        .attr('x', 0)
-       .attr('y', chartPaddingY)
+       .attr('y', chartPaddingTop / 2)
        .style("text-anchor", "start")
        //.attr('transform', "rotate(270)")
-       .text("Species(n)");
+       .text("Number of species");
 
     // create the X-axis
     svg.append("g")
        .attr("class", "axis")
-       .attr("transform", "translate(0," + (h - chartPaddingY) + ")")
-       .call(xAxis);
+       .attr("transform", "translate(0," + (h - chartPaddingBot) + ")")
+       .call(xAxis)
+       .selectAll("text")
+       .attr("y", 0)
+       .attr("x", 9)
+       .attr("dy", ".35em")
+       .attr("transform", "rotate(90)")
+       .style("text-anchor", "start");
+
+    // create X label
+    svg.append("text")             
+       .attr('x', w / 2 - chartPaddingX)
+       .attr('y', h - chartPaddingTop / 2)
+       .style("text-anchor", "start")
+       .text("Taxon group");
+
+    // chart Title
+    svg.append("text")             
+       .attr('x', w - chartPaddingX)
+       .attr('y', chartPaddingTop)
+       .style("text-anchor", "end")
+       .style("font-size", "20px")
+       .style("font-weight", "bold")
+       .text("Distribution of species in");
+
+    // corresponding country label
+    // chart Title
+    svg.append("text")             
+       .attr('x', w - chartPaddingX)
+       .attr('y', chartPaddingTop * 2)
+       .style("text-anchor", "end")
+       .style("font-size", "40px")
+       .text(countyName);
 
 	// Tooltip here
+
+};
+
+function updateBarChart() {
 
 };
