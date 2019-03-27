@@ -150,7 +150,7 @@ function makeChoropleth(mapData) {
 
 function makeBarchart(barData, countyName) {
 	// Creates a svg with a barchart
-	countyName = "Delaware"
+	countyName = "Schoharie"
 
 	// Some variables that we use later on
 	var county = barData[countyName];
@@ -163,10 +163,10 @@ function makeBarchart(barData, countyName) {
 
 	// Width and height
 	var w = 500,
-		h = 300,
+		h = 500,
 		barPadding = 1,
-		chartPaddingY = 20,
-		chartPaddingX = 20,
+		chartPaddingY = 100,
+		chartPaddingX = 50,
 		dataLength = dataset.length;
 
 	// Create SVG element
@@ -181,36 +181,63 @@ function makeBarchart(barData, countyName) {
    	   			  .enter()
    	   			  .append("rect");
 
-   	var scale = d3v5.scaleLinear()
-   					.domain([0, d3v5.max(dataset)])
-   					.range([chartPaddingY, h - chartPaddingY])
+   	// create X/Y scales
+   	var yScale = d3v5.scaleLinear()
+   					 .domain([0, d3v5.max(dataset)])
+   					 .range([h - chartPaddingY, chartPaddingY]);
 
-   	// Create colourscale
+	var xScale = d3v5.scaleBand()
+					 .domain(groupNames)
+					 .range([chartPaddingX, w - chartPaddingX])
+					 .paddingInner([0.1])
+					 .paddingOuter([0.3])
+					 .align([0.5]);			
+
+   	// Create gradient
    	var paletteScale = d3v5.scaleLinear()
-            			   .domain([d3v5.min(dataset),d3v5.max(dataset)])
-            			   .range(["#e5f5e0","#31a354"]);
+            			   .domain([d3v5.min(dataset), d3v5.max(dataset)])
+            			   .range(["#31a354", "#e5f5e0"]);
 
    	// draws the bars with data input
 	bars.attr("x", function(d, i) {
-			console.log(d, i);
-			return i * (w / dataLength);
+			return xScale(groupNames[i]);
 		})
 		.attr("y", function(d) {
-			return h - scale(d);
+			return yScale(d);
 		})
-		.attr("width", w / dataLength - barPadding)
-		.attr("height", function(d){
-			return scale(d) - chartPaddingY;
+		.attr("width", xScale.bandwidth())
+		.attr("height", function(d) {
+			return h - yScale(d) - chartPaddingY;
 		})
 		.attr("fill", function(d) {
 			return paletteScale(d);
 		});
 
-	// initialize axis here
+	// initialize axis
+	var yAxis = d3v5.axisLeft(yScale)
+					.ticks(5);
+	var xAxis = d3v5.axisBottom(xScale)
+					.ticks(groupNames.lenght);
 
-	// create the Y-axis here  
+	// create the Y-axis 
+	svg.append("g")
+       .attr("class", "axis")
+       .attr("transform", "translate(" + chartPaddingX + ",0)")
+       .call(yAxis);
 
-    // create Y label here
+    // create Y label
+	svg.append("text")             
+       .attr('x', 0)
+       .attr('y', chartPaddingY)
+       .style("text-anchor", "start")
+       //.attr('transform', "rotate(270)")
+       .text("Species(n)");
+
+    // create the X-axis
+    svg.append("g")
+       .attr("class", "axis")
+       .attr("transform", "translate(0," + (h - chartPaddingY) + ")")
+       .call(xAxis);
 
 	// Tooltip here
 
