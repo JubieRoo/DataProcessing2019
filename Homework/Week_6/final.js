@@ -7,9 +7,9 @@ This file contains the script for the creation of the plots (choropleth and bar-
 
 window.onload = function() {
 	// starts the base functions to create a choropleth and bar-chart plot
-	var biodiversityData = "biodiversity-by-county-distribution-of-animals-plants-and-natural-communities.csv";
+	var biodiversityData = "../biodiversity-by-county-distribution-of-animals-plants-and-natural-communities.csv";
 	var map = "https://gist.githubusercontent.com/markmarkoh/8717334/raw/a226c312c4eb70de3ae3eed99e9337fb64edcee3/newyork-with-counties.json"
-	var countyArea = "countyArea.csv"
+	var countyArea = "../countyArea.csv"
 	openData(biodiversityData, map, countyArea);
 };
 
@@ -111,13 +111,13 @@ function makeChoropleth(mapData) {
 
     var paletteScale = d3v5.scaleLinear()
             			   .domain([minValue,maxValue])
-            			   .range(["#EFEFFF","#02386F"]);
+            			   .range(["#e5f5e0","#31a354"]);
 
     mapData.forEach(function(item){ //
         // item example value ["USA", 70]
         var iso = item[0],
             value = item[1];
-        dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value) };
+        dataset[iso] = { numberOfSpecies: value, fillColor: paletteScale(value) };
     });
 
 	var map = new Datamap({
@@ -136,21 +136,24 @@ function makeChoropleth(mapData) {
 	            // tooltip content
 	            return ['<div class="hoverinfo">',
 	                '<strong>', geo.properties.name, '</strong>',
-	                '<br>Species per state: <strong>', data.numberOfThings, '</strong>',
+	                '<br>Species per state: <strong>', data.numberOfSpecies, '</strong>',
 	                '</div>'].join('');
         	}
     	},
 		scope: "subunits-ny",
-		data: dataset,
-		// show desired information in tooltip
-        
+		data: dataset    
 	});
 };
 
 
-function makeBarchart(barData) {
-	// creates a svg with a barchart
-	var county = barData["Albany"];
+
+
+function makeBarchart(barData, countyName) {
+	// Creates a svg with a barchart
+	countyName = "Delaware"
+
+	// Some variables that we use later on
+	var county = barData[countyName];
 	var dataset = [];
 	var groupNames = [];
 	for (var value in county) {
@@ -160,22 +163,55 @@ function makeBarchart(barData) {
 
 	// Width and height
 	var w = 500,
-		h = 100;
+		h = 300,
+		barPadding = 1,
+		chartPaddingY = 20,
+		chartPaddingX = 20,
+		dataLength = dataset.length;
 
-	// create SVG element
-	var svg = d3v5.select("bar-chart")
+	// Create SVG element
+	var svg = d3v5.select("#bar-chart")
 				  .append("svg")
 				  .attr("width", w)
 				  .attr("height", h);
 
-	// create rectangles
-	svg.selectAll("rect")
-   	   .data()
-   	   .enter()
-   	   .append("rect")
-   	   .attr("x", 0)
-       .attr("y", 0)
-       .attr("width", 20)
-       .attr("height", 100);
+	// Create rectangle elements
+	var bars = svg.selectAll("rect")
+   	    		  .data(dataset)
+   	   			  .enter()
+   	   			  .append("rect");
+
+   	var scale = d3v5.scaleLinear()
+   					.domain([0, d3v5.max(dataset)])
+   					.range([chartPaddingY, h - chartPaddingY])
+
+   	// Create colourscale
+   	var paletteScale = d3v5.scaleLinear()
+            			   .domain([d3v5.min(dataset),d3v5.max(dataset)])
+            			   .range(["#e5f5e0","#31a354"]);
+
+   	// draws the bars with data input
+	bars.attr("x", function(d, i) {
+			console.log(d, i);
+			return i * (w / dataLength);
+		})
+		.attr("y", function(d) {
+			return h - scale(d);
+		})
+		.attr("width", w / dataLength - barPadding)
+		.attr("height", function(d){
+			return scale(d) - chartPaddingY;
+		})
+		.attr("fill", function(d) {
+			return paletteScale(d);
+		});
+
+	// initialize axis here
+
+	// create the Y-axis here  
+
+    // create Y label here
+
+	// Tooltip here
 
 };
