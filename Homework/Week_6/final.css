@@ -6,7 +6,15 @@ This file creates the styling for the linked-views webpage
 */
 
 
-.d3-tip span {
-    color: #ff00c7;
-  }
-
+div.tooltip {
+  color: white;
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 28px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: rgba(0,0,0,.8);
+  border: 2px solid black;
+  pointer-events: none;
+}

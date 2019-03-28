@@ -24,8 +24,8 @@ function openData(biodiversityData, map, countyArea) {
 		var transformedData = transformData(data[0], data[1], countyIsID);
 		var choroplethData = transformedData[0];
 		var barchartData = transformedData[1];
-		makeChoropleth(choroplethData);
-		makeBarchart(barchartData);
+		makeChoropleth(choroplethData, barchartData);
+		makeBarchart(barchartData, "Suffolk");
 	});
 };
 
@@ -102,8 +102,8 @@ function countyToID(map) {
 };
 
 
-function makeChoropleth(mapData) {
-// makes a custom map 
+function makeChoropleth(mapData, barData) {
+	// makes a custom map 
 	var dataset = {};
 	var onlyValues = mapData.map(function(obj){ return obj[1]; });
     var minValue = Math.min.apply(null, onlyValues),
@@ -113,8 +113,7 @@ function makeChoropleth(mapData) {
             			   .domain([minValue,maxValue])
             			   .range(["#e5f5e0","#31a354"]);
 
-    mapData.forEach(function(item){ //
-        // item example value ["USA", 70]
+    mapData.forEach(function(item){
         var iso = item[0],
             value = item[1];
         dataset[iso] = { numberOfSpecies: value, fillColor: paletteScale(value) };
@@ -141,8 +140,39 @@ function makeChoropleth(mapData) {
         	}
     	},
 		scope: "subunits-ny",
-		data: dataset    
-	});
+		data: dataset,
+		done: function(datamap) {
+            datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+                updateBarChart(barData, geography.properties.name);
+            })
+        }
+	}); 
+
+	// Width and height
+	var w = 500,
+		h = 500;
+
+	// Padding
+	var barPadding = 1,
+		chartPaddingTop = 50,
+		chartPaddingBot = 150
+		chartPaddingX = 50;
+
+	// open svg
+	var svg = d3v5.select("svg")
+
+	// chart Title
+    svg.append("text")
+       .attr("class", "choropleth-title")             
+       .attr('x', w - chartPaddingX)
+       .attr('y', 0 + chartPaddingTop)
+       .style("text-anchor", "end")
+       .style("font-size", "20px")
+       .style("font-weight", "bold")
+       .text("Species density of the state New York");
+
+    // legend
+   	map.legend()
 };
 
 
@@ -150,10 +180,11 @@ function makeChoropleth(mapData) {
 
 function makeBarchart(barData, countyName) {
 	// Creates a svg with a barchart
-	countyName = "New York"
 
 	// Some variables that we use later on
 	var county = barData[countyName];
+
+	// Creates two arrays to hold species and names
 	var dataset = [];
 	var groupNames = [];
 	for (var value in county) {
@@ -163,12 +194,16 @@ function makeBarchart(barData, countyName) {
 
 	// Width and height
 	var w = 500,
-		h = 500,
-		barPadding = 1,
+		h = 500;
+
+	// Padding
+	var barPadding = 1,
 		chartPaddingTop = 50,
 		chartPaddingBot = 150
-		chartPaddingX = 50,
-		dataLength = dataset.length;
+		chartPaddingX = 50;
+
+	// Lenght of dataset
+	var dataLength = dataset.length;
 
 	// Create SVG element
 	var svg = d3v5.select("#bar-chart")
@@ -183,10 +218,9 @@ function makeBarchart(barData, countyName) {
    	   			  .append("rect");
 
    	// create X/Y scales
-   	var yScale = d3v5.scaleLinear()
+   	var yScale = d3v5.scaleSqrt()
    					 .domain([0, d3v5.max(dataset)])
    					 .range([h - chartPaddingBot, chartPaddingTop]);
-
 	var xScale = d3v5.scaleBand()
 					 .domain(groupNames)
 					 .range([chartPaddingX, w - chartPaddingX])
@@ -194,12 +228,13 @@ function makeBarchart(barData, countyName) {
 					 .paddingOuter([0.3])
 					 .align([0.5]);			
 
-   	// Create gradient
-   	var paletteScale = d3v5.scaleLinear()
-            			   .domain([d3v5.min(dataset), d3v5.max(dataset)])
-            			   .range(["#31a354", "#e5f5e0"]);
+    // Tooltip
+	var div = d3v5.select('#bar-chart')
+				  .append('div')
+				  .attr('class', 'tooltip')
+				  .style('opacity', 0);
 
-   	// draws the bars with data input
+   	// Draws the bars with data input
 	bars.attr("x", function(d, i) {
 			return xScale(groupNames[i]);
 		})
@@ -210,9 +245,21 @@ function makeBarchart(barData, countyName) {
 		.attr("height", function(d) {
 			return h - yScale(d) - chartPaddingBot;
 		})
-		.attr("fill", function(d) {
-			return paletteScale(d);
-		});
+		.attr("fill", "#31a354")
+		.on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", 1);		
+            div.html(": " +d)	
+                .style("left", 135 + "px")		
+                .style("top", 9 + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+
 
 	// initialize axis
 	var yAxis = d3v5.axisLeft(yScale)
@@ -222,21 +269,21 @@ function makeBarchart(barData, countyName) {
 
 	// create the Y-axis 
 	svg.append("g")
-       .attr("class", "axis")
+       .attr("class", "y-axis")
        .attr("transform", "translate(" + chartPaddingX + ",0)")
        .call(yAxis);
 
     // create Y label
-	svg.append("text")             
+	svg.append("text") 
+	   .attr("class", "y-label")            
        .attr('x', 0)
        .attr('y', chartPaddingTop / 2)
        .style("text-anchor", "start")
-       //.attr('transform', "rotate(270)")
        .text("Number of species");
 
     // create the X-axis
     svg.append("g")
-       .attr("class", "axis")
+       .attr("class", "x-axis")
        .attr("transform", "translate(0," + (h - chartPaddingBot) + ")")
        .call(xAxis)
        .selectAll("text")
@@ -247,7 +294,8 @@ function makeBarchart(barData, countyName) {
        .style("text-anchor", "start");
 
     // create X label
-    svg.append("text")             
+    svg.append("text")
+       .attr("class", "x-label")             
        .attr('x', w / 2 - chartPaddingX)
        .attr('y', h - chartPaddingTop / 2)
        .style("text-anchor", "start")
@@ -262,19 +310,80 @@ function makeBarchart(barData, countyName) {
        .style("font-weight", "bold")
        .text("Distribution of species in");
 
-    // corresponding country label
-    // chart Title
-    svg.append("text")             
+    // corresponding county label
+    svg.append("text")
+       .attr("class", "county-label")             
        .attr('x', w - chartPaddingX)
        .attr('y', chartPaddingTop * 2)
        .style("text-anchor", "end")
        .style("font-size", "40px")
        .text(countyName);
-
-	// Tooltip here
-
 };
 
-function updateBarChart() {
 
+function updateBarChart(barData, countyName) {
+	var county = barData[countyName];
+	var dataset = [],
+		groupNames = [];
+
+	for (var value in county) {
+		dataset.push(county[value]);
+		groupNames.push(value);
+	}
+
+	// Width and height
+	var w = 500,
+		h = 500;
+
+	// Padding
+	var barPadding = 1,
+		chartPaddingTop = 50,
+		chartPaddingBot = 150
+		chartPaddingX = 50;
+
+	// Lenghts
+	var dataLength = dataset.length;
+	var duration = 1000;
+
+   	// create X/Y scales
+   	var yScale = d3v5.scaleSqrt()
+   					 .domain([0, d3v5.max(dataset)])
+   					 .range([h - chartPaddingBot, chartPaddingTop]);
+	var xScale = d3v5.scaleBand()
+					 .domain(groupNames)
+					 .range([chartPaddingX, w - chartPaddingX])
+					 .paddingInner([0.1])
+					 .paddingOuter([0.3])
+					 .align([0.5]);			
+
+	// Update rectangles
+	var bars = d3v5.selectAll("rect")
+				   .data(dataset);
+	bars.enter()
+		.append("rect")
+		.attr('class', "bar")
+        .attr('width', xScale.bandwidth())
+        .attr('height', 0)
+        .attr('y', h)
+		.merge(bars)
+        .transition()
+        .duration(duration)
+		.attr("x", function(d, i) {
+			return xScale(groupNames[i]);
+		})
+		.attr("y", function(d) {
+			return yScale(d);
+		})
+		.attr("width", xScale.bandwidth())
+		.attr("height", function(d) {
+			return h - yScale(d) - chartPaddingBot;
+		})
+		.attr("fill", "#31a354");
+
+	// hide unused groups
+	bars.exit()
+        .transition()
+        .duration(duration)
+        .attr('height', 0)
+        .attr('y', h - chartPaddingBot);
 };
